@@ -2,6 +2,7 @@ package it.prova.pokeronline.dto;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotBlank;
@@ -15,6 +16,8 @@ import it.prova.pokeronline.model.Utente;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UtenteDTO {
+
+	private Long id;
 
 	@NotBlank(message = "{username.notblank}")
 	@Size(min = 3, max = 15, message = "Il valore inserito '${validatedValue}' deve essere lungo tra {min} e {max} caratteri")
@@ -45,6 +48,31 @@ public class UtenteDTO {
 		this.nome = nome;
 		this.cognome = cognome;
 		this.stato = stato;
+	}
+
+	public UtenteDTO(Long id,
+			@NotBlank(message = "{username.notblank}") @Size(min = 3, max = 15, message = "Il valore inserito '${validatedValue}' deve essere lungo tra {min} e {max} caratteri") String username,
+			@NotBlank(message = "{nome.notblank}") String nome,
+			@NotBlank(message = "{cognome.notblank}") String cognome, Integer esperienzaAccumulata,
+			Integer creditoAccumulato, LocalDate registrazione, StatoUtente stato, Long[] ruoliIds) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.nome = nome;
+		this.cognome = cognome;
+		this.esperienzaAccumulata = esperienzaAccumulata;
+		this.creditoAccumulato = creditoAccumulato;
+		this.registrazione = registrazione;
+		this.stato = stato;
+		this.ruoliIds = ruoliIds;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getUsername() {
@@ -96,23 +124,24 @@ public class UtenteDTO {
 		return result;
 	}
 
-//	this.username = username;
-//	this.nome = nome;
-//	this.cognome = cognome;
-//	this.registrazione = registrazione;
-//	this.stato = stato;
-//	this.esperienzaAccumulata = esperienzaAccumulata;
-//	this.creditoAccumulato = creditoAccumulato;
 	// niente password...
 	public static UtenteDTO buildUtenteDTOFromModel(Utente utenteModel) {
 		UtenteDTO result = new UtenteDTO(utenteModel.getUsername(), utenteModel.getNome(), utenteModel.getCognome(),
 				utenteModel.getStato());
 
-		if (!utenteModel.getRuoli().isEmpty())
-			result.ruoliIds = utenteModel.getRuoli().stream().map(r -> r.getId()).collect(Collectors.toList())
-					.toArray(new Long[] {});
+		if (utenteModel.getRuoli().isEmpty()) {
+			throw new RuntimeException("Ruolo non trovato DTO");
+		}
+		result.ruoliIds = utenteModel.getRuoli().stream().map(r -> r.getId()).collect(Collectors.toList())
+				.toArray(new Long[] {});
 
 		return result;
+	}
+
+	public static List<UtenteDTO> buildDTOListFromModelList(List<Utente> utenti) {
+		return utenti.stream().map(i -> {
+			return UtenteDTO.buildUtenteDTOFromModel(i);
+		}).collect(Collectors.toList());
 	}
 
 	public Integer getEsperienzaAccumulata() {

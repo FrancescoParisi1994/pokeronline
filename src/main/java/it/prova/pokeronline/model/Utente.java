@@ -52,6 +52,29 @@ public class Utente {
 		super();
 	}
 
+	public Utente(String username, String password, String nome, String cognome, LocalDate registrazione,
+			Integer esperienzaAccumulata, Integer creditoAccumulato) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.nome = nome;
+		this.cognome = cognome;
+		this.registrazione = registrazione;
+		this.esperienzaAccumulata = esperienzaAccumulata;
+		this.creditoAccumulato = creditoAccumulato;
+	}
+
+	public Utente(String username, String password, String nome, String cognome, Integer esperienzaAccumulata,
+			Integer creditoAccumulato) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.nome = nome;
+		this.cognome = cognome;
+		this.esperienzaAccumulata = esperienzaAccumulata;
+		this.creditoAccumulato = creditoAccumulato;
+	}
+
 	public Utente(Long id, String username, String password, String nome, String cognome, LocalDate registrazione,
 			StatoUtente stato, Integer esperienzaAccumulata, Integer creditoAccumulato, Set<Ruolo> ruoli) {
 		super();

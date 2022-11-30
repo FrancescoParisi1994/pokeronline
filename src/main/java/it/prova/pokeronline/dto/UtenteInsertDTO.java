@@ -1,11 +1,15 @@
 package it.prova.pokeronline.dto;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class UtenteInsertDTO {
+import it.prova.pokeronline.model.Ruolo;
+import it.prova.pokeronline.model.Utente;
 
-	private Long id;
+public class UtenteInsertDTO {
 
 	@NotBlank(message = "{username.notblank}")
 	@Size(min = 3, max = 15, message = "Il valore inserito '${validatedValue}' deve essere lungo tra {min} e {max} caratteri")
@@ -26,19 +30,20 @@ public class UtenteInsertDTO {
 	private Integer esperienzaAccumulata;
 
 	private Integer creditoAccumulato;
+	
+	private Long[] ruoliIds;
 
 	public UtenteInsertDTO() {
 		super();
 	}
 
-	public UtenteInsertDTO(Long id,
+	public UtenteInsertDTO(
 			@NotBlank(message = "{username.notblank}") @Size(min = 3, max = 15, message = "Il valore inserito '${validatedValue}' deve essere lungo tra {min} e {max} caratteri") String username,
 			@NotBlank(message = "{password.notblank}") @Size(min = 8, max = 15, message = "Il valore inserito deve essere lungo tra {min} e {max} caratteri") String password,
 			String confermaPassword, @NotBlank(message = "{nome.notblank}") String nome,
 			@NotBlank(message = "{cognome.notblank}") String cognome, Integer esperienzaAccumulata,
 			Integer creditoAccumulato) {
 		super();
-		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.confermaPassword = confermaPassword;
@@ -46,14 +51,6 @@ public class UtenteInsertDTO {
 		this.cognome = cognome;
 		this.esperienzaAccumulata = esperienzaAccumulata;
 		this.creditoAccumulato = creditoAccumulato;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getUsername() {
@@ -110,6 +107,13 @@ public class UtenteInsertDTO {
 
 	public void setCreditoAccumulato(Integer creditoAccumulato) {
 		this.creditoAccumulato = creditoAccumulato;
+	}
+
+	public Utente buildDTOFromModel() {
+		Utente result=new Utente(this.username, this.password, this.nome, this.cognome, this.esperienzaAccumulata, this.creditoAccumulato);
+				if (ruoliIds != null)
+					result.setRuoli(Arrays.asList(ruoliIds).stream().map(id -> new Ruolo(id)).collect(Collectors.toSet()));
+		return result;
 	}
 
 }

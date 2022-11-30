@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import it.prova.pokeronline.model.StatoUtente;
 import it.prova.pokeronline.model.Utente;
 import it.prova.pokeronline.repository.utente.UtenteRepository;
+import it.prova.pokeronline.web.api.exception.UtenteNonEliminabileException;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,7 +24,13 @@ public class UtenteServiceImpl implements UtenteService {
 	private PasswordEncoder passwordEncoder;
 
 	public List<Utente> listAllUtenti() {
-		return (List<Utente>) repository.findAll();
+		List<Utente> utentes=(List<Utente>) repository.findAllRuoli();
+		for (Utente utente : utentes) {
+			if (utente.getRuoli().isEmpty()) {
+				throw new RuntimeException("Ruolo inesistente Service");
+			}
+		}
+		return utentes;
 	}
 
 	public Utente caricaSingoloUtente(Long id) {
@@ -35,7 +42,7 @@ public class UtenteServiceImpl implements UtenteService {
 	}
 
 	@Transactional
-	public void aggiorna(Utente utenteInstance) {
+	public Utente aggiorna(Utente utenteInstance) {
 		// deve aggiornare solo nome, cognome, username, ruoli
 		Utente utenteReloaded = repository.findById(utenteInstance.getId()).orElse(null);
 		if (utenteReloaded == null)
@@ -44,19 +51,23 @@ public class UtenteServiceImpl implements UtenteService {
 		utenteReloaded.setCognome(utenteInstance.getCognome());
 		utenteReloaded.setUsername(utenteInstance.getUsername());
 		utenteReloaded.setRuoli(utenteInstance.getRuoli());
-		repository.save(utenteReloaded);
+		return repository.save(utenteReloaded);
 	}
 
 	@Transactional
-	public void inserisciNuovo(Utente utenteInstance) {
+	public Utente inserisciNuovo(Utente utenteInstance) {
 		utenteInstance.setStato(StatoUtente.CREATO);
 		utenteInstance.setPassword(passwordEncoder.encode(utenteInstance.getPassword()));
 		utenteInstance.setRegistrazione(LocalDate.now());
-		repository.save(utenteInstance);
+		return repository.save(utenteInstance);
 	}
 
 	@Transactional
 	public void rimuovi(Long idToRemove) {
+		Utente utente=caricaSingoloUtente(idToRemove);
+		if (utente.getStato()==StatoUtente.ATTIVO) {
+			throw new UtenteNonEliminabileException("Questo utente non puo' essere ancora eliminato");
+		}
 		repository.deleteById(idToRemove);
 		;
 	}
@@ -86,10 +97,15 @@ public class UtenteServiceImpl implements UtenteService {
 			utenteInstance.setStato(StatoUtente.DISABILITATO);
 		else if (utenteInstance.getStato().equals(StatoUtente.DISABILITATO))
 			utenteInstance.setStato(StatoUtente.ATTIVO);
+		 repository.save(utenteInstance);
 	}
 
+	@Transactional(readOnly = true)
 	public Utente findByUsername(String username) {
-		return repository.findByUsername(username).orElse(null);
+		Utente utente=repository.findByUsername(username).orElse(null);
+		return utente;
 	}
+	
+	
 
 }
