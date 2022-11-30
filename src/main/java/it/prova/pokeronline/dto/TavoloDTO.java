@@ -2,6 +2,7 @@ package it.prova.pokeronline.dto;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -115,11 +116,8 @@ public class TavoloDTO {
 				}).collect(Collectors.toSet()), UtenteDTO.buildUtenteDTOFromModel(tavolo.getUtenteCreazione()));
 		return result;
 	}
-//	this.id = id;
-//	this.esperienzaMin = esperienzaMin;
-//	this.cifraMinima = cifraMinima;
-//	this.denominazione = denominazione;
-//	this.dataCreazione = dataCreazione;
-//	this.giocatori = giocatori;
-//	this.utenteCreazione = utenteCreazione;
+
+	public static List<TavoloDTO> buildDTOListFromModelList(List<Tavolo> tavolos) {
+		return tavolos.stream().map(i->{return TavoloDTO.buildDTOFromModel(i);}).collect(Collectors.toList());
+	}
 }

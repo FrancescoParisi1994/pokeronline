@@ -36,7 +36,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	@ExceptionHandler(UtenteNotFoundExcepition.class)
-	public ResponseEntity<Object> handleFilmNotFoundException(UtenteNotFoundExcepition ex, WebRequest request) {
+	public ResponseEntity<Object> handleUtenteNotFoundExcepition(UtenteNotFoundExcepition ex, WebRequest request) {
 
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put("timestamp", LocalDateTime.now());
@@ -45,17 +45,28 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
 		return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
+	
+	@ExceptionHandler(TavoloNotFoundExcepition.class)
+	public ResponseEntity<Object> handleTavoloNotFoundExcepition(TavoloNotFoundExcepition ex, WebRequest request) {
+		
+		Map<String, Object> body = new LinkedHashMap<>();
+		body.put("timestamp", LocalDateTime.now());
+		body.put("message", ex.getMessage());
+		body.put("status", HttpStatus.NOT_FOUND);
+		
+		return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+	}
 
-//	@ExceptionHandler(RegistaNotFoundException.class)
-//	public ResponseEntity<Object> handleRegistaNotFoundException(RegistaNotFoundException ex, WebRequest request) {
-//
-//		Map<String, Object> body = new LinkedHashMap<>();
-//		body.put("timestamp", LocalDateTime.now());
-//		body.put("message", ex.getMessage());
-//		body.put("status", HttpStatus.NOT_FOUND);
-//
-//		return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-//	}
+	@ExceptionHandler(UtenteNonEliminabileException.class)
+	public ResponseEntity<Object> handleUtenteNonEliminabileException(UtenteNonEliminabileException ex, WebRequest request) {
+
+		Map<String, Object> body = new LinkedHashMap<>();
+		body.put("timestamp", LocalDateTime.now());
+		body.put("message", ex.getMessage());
+		body.put("status", HttpStatus.NOT_FOUND);
+
+		return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+	}
 
 	@ExceptionHandler(IdNotNullForInsertException.class)
 	public ResponseEntity<Object> handleIdNotNullForInsertException(IdNotNullForInsertException ex,
@@ -67,6 +78,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		body.put("status", HttpStatus.UNPROCESSABLE_ENTITY);
 
 		return new ResponseEntity<>(body, HttpStatus.UNPROCESSABLE_ENTITY);
+	}
+	
+	@ExceptionHandler(UtenteNonAbilitatoException.class)
+	public ResponseEntity<Object> handleUtenteNonAbilitatoException(UtenteNonAbilitatoException ex,
+			WebRequest request) {
+		
+		Map<String, Object> body = new LinkedHashMap<>();
+		body.put("timestamp", LocalDateTime.now());
+		body.put("message", ex.getMessage());
+		body.put("status", HttpStatus.FORBIDDEN);
+		
+		return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
 	}
 
 }

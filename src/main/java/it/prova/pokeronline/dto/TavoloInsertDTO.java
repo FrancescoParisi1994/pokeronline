@@ -12,11 +12,11 @@ import it.prova.pokeronline.model.Utente;
 public class TavoloInsertDTO {
 
 	private Long id;
-	@NotNull(message = "{}")
+	@NotNull(message = "{esperienzaMin.notnull}")
 	private Integer esperienzaMin;
-	@NotNull(message = "{}")
+	@NotNull(message = "{cifraMinima.notnull}")
 	private Integer cifraMinima;
-	@NotBlank(message = "{}")
+	@NotBlank(message = "{denominazione.notblanck}")
 	private String denominazione;
 
 	private Set<Utente> giocatori = new HashSet<>();

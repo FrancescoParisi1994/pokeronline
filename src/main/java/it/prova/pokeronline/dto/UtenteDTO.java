@@ -23,10 +23,8 @@ public class UtenteDTO {
 	@Size(min = 3, max = 15, message = "Il valore inserito '${validatedValue}' deve essere lungo tra {min} e {max} caratteri")
 	private String username;
 
-	@NotBlank(message = "{nome.notblank}")
 	private String nome;
 
-	@NotBlank(message = "{cognome.notblank}")
 	private String cognome;
 
 	private Integer esperienzaAccumulata;
@@ -129,9 +127,7 @@ public class UtenteDTO {
 		UtenteDTO result = new UtenteDTO(utenteModel.getUsername(), utenteModel.getNome(), utenteModel.getCognome(),
 				utenteModel.getStato());
 
-		if (utenteModel.getRuoli().isEmpty()) {
-			throw new RuntimeException("Ruolo non trovato DTO");
-		}
+		
 		result.ruoliIds = utenteModel.getRuoli().stream().map(r -> r.getId()).collect(Collectors.toList())
 				.toArray(new Long[] {});
 

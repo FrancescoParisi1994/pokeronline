@@ -24,7 +24,7 @@ public class UtenteServiceImpl implements UtenteService {
 	private PasswordEncoder passwordEncoder;
 
 	public List<Utente> listAllUtenti() {
-		List<Utente> utentes=(List<Utente>) repository.findAllRuoli();
+		List<Utente> utentes = (List<Utente>) repository.findAllRuoli();
 		for (Utente utente : utentes) {
 			if (utente.getRuoli().isEmpty()) {
 				throw new RuntimeException("Ruolo inesistente Service");
@@ -64,12 +64,12 @@ public class UtenteServiceImpl implements UtenteService {
 
 	@Transactional
 	public void rimuovi(Long idToRemove) {
-		Utente utente=caricaSingoloUtente(idToRemove);
-		if (utente.getStato()==StatoUtente.ATTIVO) {
+		Utente utente = caricaSingoloUtente(idToRemove);
+		if (utente.getStato() == StatoUtente.ATTIVO) {
 			throw new UtenteNonEliminabileException("Questo utente non puo' essere ancora eliminato");
 		}
 		repository.deleteById(idToRemove);
-		;
+
 	}
 
 	public List<Utente> findByExample(Utente example) {
@@ -86,8 +86,8 @@ public class UtenteServiceImpl implements UtenteService {
 	}
 
 	@Transactional
-	public void changeUserAbilitation(Long utenteInstanceId) {
-		Utente utenteInstance = caricaSingoloUtente(utenteInstanceId);
+	public void changeUserAbilitation(Long id) {
+		Utente utenteInstance = caricaSingoloUtente(id);
 		if (utenteInstance == null)
 			throw new RuntimeException("Elemento non trovato.");
 
@@ -97,15 +97,38 @@ public class UtenteServiceImpl implements UtenteService {
 			utenteInstance.setStato(StatoUtente.DISABILITATO);
 		else if (utenteInstance.getStato().equals(StatoUtente.DISABILITATO))
 			utenteInstance.setStato(StatoUtente.ATTIVO);
-		 repository.save(utenteInstance);
+		repository.save(utenteInstance);
+	}
+	
+	@Transactional
+	public void changeUserAbilitation(String username) {
+		Utente utenteInstance = findByUsername(username);
+		if (utenteInstance == null)
+			throw new RuntimeException("Elemento non trovato.");
+		
+		if (utenteInstance.getStato() == null || utenteInstance.getStato().equals(StatoUtente.CREATO))
+			utenteInstance.setStato(StatoUtente.ATTIVO);
+		else if (utenteInstance.getStato().equals(StatoUtente.ATTIVO))
+			utenteInstance.setStato(StatoUtente.DISABILITATO);
+		else if (utenteInstance.getStato().equals(StatoUtente.DISABILITATO))
+			utenteInstance.setStato(StatoUtente.ATTIVO);
+		repository.save(utenteInstance);
 	}
 
 	@Transactional(readOnly = true)
 	public Utente findByUsername(String username) {
-		Utente utente=repository.findByUsername(username).orElse(null);
+		Utente utente = repository.findByUsername(username).orElse(null);
 		return utente;
 	}
-	
-	
 
+	@Transactional
+	public void abilita(Utente utente) {
+		Utente utenteDaAbilitare = findByUsername(utente.getUsername());
+		if (utenteDaAbilitare == null) {
+			throw new RuntimeException("Elemento non trovato.");
+		}
+		utenteDaAbilitare.setRuoli(utente.getRuoli());
+		utenteDaAbilitare.setStato(StatoUtente.ATTIVO);
+		repository.save(utenteDaAbilitare);
+	}
 }

@@ -24,8 +24,12 @@ public interface UtenteService {
 
 	public Utente eseguiAccesso(String username, String password);
 
-	public void changeUserAbilitation(Long utenteInstanceId);
+	public void changeUserAbilitation(String usernameString);
+	
+	public void changeUserAbilitation(Long id);
 
 	public Utente findByUsername(String username);
+	
+	public void abilita(Utente utente);
 
 }

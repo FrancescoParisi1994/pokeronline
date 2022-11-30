@@ -19,11 +19,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import it.prova.pokeronline.dto.UtenteAbilitaDTO;
 import it.prova.pokeronline.dto.UtenteDTO;
 import it.prova.pokeronline.dto.UtenteInsertDTO;
 import it.prova.pokeronline.model.StatoUtente;
+import it.prova.pokeronline.model.Tavolo;
 import it.prova.pokeronline.model.Utente;
 import it.prova.pokeronline.security.dto.UtenteInfoJWTResponseDTO;
+import it.prova.pokeronline.service.TavoloService;
 import it.prova.pokeronline.service.UtenteService;
 import it.prova.pokeronline.web.api.exception.UtenteNonEliminabileException;
 import it.prova.pokeronline.web.api.exception.UtenteNotFoundExcepition;
@@ -34,6 +37,9 @@ public class UtenteController {
 
 	@Autowired
 	private UtenteService utenteService;
+
+	@Autowired
+	private TavoloService tavoloService;
 
 	// questa mi serve solo per capire se solo ADMIN vi ha accesso
 	@GetMapping("/testSoloAdmin")
@@ -82,18 +88,39 @@ public class UtenteController {
 		return UtenteDTO.buildUtenteDTOFromModel(utenteDTO.buildUtenteModel(false));
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{username}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@PathVariable(required = true) Long id) {
-		Utente utente = utenteService.caricaSingoloUtente(id);
+	public void delete(@PathVariable(required = true) String username) {
+		Utente utente = utenteService.findByUsername(username);
 		if (utente.getStato() == StatoUtente.ATTIVO) {
 			throw new UtenteNonEliminabileException("Utente non eliminabile");
 		}
-		utenteService.rimuovi(id);
+		utenteService.rimuovi(utente.getId());
 	}
 
-	@GetMapping("/disabilita/{id}")
-	public void cambioStato(@PathVariable(required = true) Long id) {
-		utenteService.changeUserAbilitation(id);
+	@PutMapping("/cambioStato/{username}")
+	public void cambioStato(@PathVariable(required = true) String username) {
+		utenteService.changeUserAbilitation(username);
+	}
+	
+	@PostMapping("/abilita")
+	public void abilita(@Valid @RequestBody UtenteAbilitaDTO utenteAbilitaDTO) {
+		utenteService.abilita(utenteAbilitaDTO.buildModelFromDto());
+	}
+	
+	@GetMapping("/tavolo")
+	public List<Tavolo> findAllTavoli(){
+		return tavoloService.findAll();
+	}
+	
+	@GetMapping("/tavolo/{id}")
+	public Tavolo findById(@PathVariable(required = true) Long id){
+		return tavoloService.findById(id);
+	}
+	
+	@DeleteMapping("/tavolo/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void delete(@PathVariable(required = true)Long id) {
+		tavoloService.delete(id);
 	}
 }
